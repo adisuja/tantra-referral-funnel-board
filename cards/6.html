@@ -25,6 +25,15 @@ Batch 1, the single activation (PRD 9a), behind flag REFERRAL_KIND (switch refer
 - Main app (request only, never commit to Usetantra/*): add G6 (no second Pro trial for someone who activated here) to
   docs/crm/requests/MAIN_APP_REQUEST_2026_11_18_ENTITLEMENT.md and confirm G5 (entitlement read) status with the dev team.
 
+Batch 1b, outreach gaps (deliverables/08-outreach-process/PROCESS.md section 6, file:line references there): G12 one
+&quot;Import my contacts&quot; screen (Google Contacts + Other contacts via People API scopes, Gmail correspondents all pages, WhatsApp
+chats all pages, LinkedIn connections via Unipile relations, vCard upload, merged per team member); G13 step sender &quot;deal
+owner&quot; (their WhatsApp, LinkedIn or mailbox); G14 approve-batch before a sequence sends; G15 AI personal line per contact as
+a sourced custom field; G16 {{tracked_link}} to hello.jointantra.com with ?r= token plus clicked/visited conditions; G17
+contact owner per member, first owner wins; G18 SMS number per member and an email daily cap; G19 signed outbound webhook
+with token and sender that POSTs {token, first_name, company, hook, sender} to https://hello.jointantra.com/api/prospects
+(Bearer key in ~/.config/tantra/keys/trf-admin.env, set as a Worker secret on your side).
+
 Batch 2, the &quot;referral&quot; funnel kind (PRD 9b): FUNNEL_KINDS, ENGINE_KINDS, KIND_TEXT, method/network/kind.md, KIND_SPECS,
 kindWords, kindSizing, typeDefaults; a referral template (invite, welcome, booked pages; booking page; the pipeline; the
 sequences in TRIAL_SEQUENCES.md); a page per team member; compose and approve and send reused from src/referralFunnel

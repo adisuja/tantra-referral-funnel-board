@@ -27,8 +27,13 @@
 </tr>
 <tr>
 <td><code>{link}</code></td>
-<td>The sender's tracked page link, with a recipient token, e.g. <code>https://hello.jointantra.com/adi/?r=TOKEN</code></td>
+<td>The prospect's own page, made by tools/push_prospects.py, e.g. <code>https://hello.jointantra.com/adi/?r=TOKEN</code>. Opening it shows their name, company and <code>{hook}</code> above the fold</td>
 <td>Never send without it</td>
+</tr>
+<tr>
+<td><code>{hook}</code></td>
+<td>AI field: one sentence in the sender's voice about why they thought of this person, from a sourced fact. Shown on the page under the headline</td>
+<td>Page shows the general headline</td>
 </tr>
 <tr>
 <td><code>{sender_first_name}</code></td>
@@ -59,6 +64,11 @@ Without <code>{company}</code> or <code>{focus}</code>: "Given what you work on,
 <p>Would you be interested?</p>
 <p>{sender_first_name}</p>
 </blockquote>
+<p><strong>SMS</strong> (from the sender's Tantra number, under 300 characters, opt out on every first SMS)</p>
+<blockquote>
+<p>Hi {first_name}, it's {sender_first_name} from Tantra. We built something new and I'd love your honest feedback. I made you a short page with a 4 min video: {link} Reply STOP to opt out.</p>
+</blockquote>
+<p>SMS goes only to contacts with a phone number and no WhatsApp reply in 48 hours, and only where texting a personal contact is allowed (see the PRD, sending rules).</p>
 <h2>Message 2: if no reply (day 3, same channel)</h2>
 <blockquote>
 <p>Hey {first_name}, just bumping this in case it got buried. The video is under 5 minutes: {link}. Even a one line reaction would help us a lot.</p>

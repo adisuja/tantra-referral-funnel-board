@@ -1,0 +1,178 @@
+<details class="doc" open><summary>PROCESS.md</summary><div class="md"><h1>Outreach process: import, personalise, send</h1>
+<p>How each team member gets every personal contact into the Tantra referral funnel and invites them from their own accounts. Phase 1 runs today on what Tantra already has. Phase 2 (the gaps at the end) makes it one screen in Tantra.</p>
+<h2>1. Import every contact (about 15 minutes per person)</h2>
+<p>There is no one-screen import in Tantra yet (gap G12). Each source has a quick official export, and one command merges them all.</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>How to export it</th>
+<th>What it gives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Google Contacts and Gmail</td>
+<td>https://contacts.google.com &gt; Export &gt; Contacts (all) and Other contacts &gt; Google CSV. "Other contacts" is everyone you have emailed</td>
+<td>Names, emails, phones, company, title</td>
+</tr>
+<tr>
+<td>Phone contacts (iPhone)</td>
+<td>https://www.icloud.com/contacts &gt; select all &gt; Export vCard</td>
+<td>Names, mobiles, emails, company</td>
+</tr>
+<tr>
+<td>Phone contacts (Android)</td>
+<td>Contacts app &gt; Fix and manage &gt; Export to file (.vcf)</td>
+<td>Same</td>
+</tr>
+<tr>
+<td>WhatsApp and SMS</td>
+<td>The same people as the phone contacts: WhatsApp reads your phone's address book, so the vCard covers them</td>
+<td>Mobiles for WhatsApp and SMS</td>
+</tr>
+<tr>
+<td>LinkedIn</td>
+<td>https://www.linkedin.com/mypreferences/d/download-my-data &gt; Connections &gt; Request archive (ready in about 10 minutes)</td>
+<td>Name, company, position, profile link</td>
+</tr>
+</tbody>
+</table>
+<p>Then one command merges and de-duplicates everything (one person, one row, matched on email, phone or LinkedIn):</p>
+<pre><code class="language-bash">python3 tools/import_contacts.py adi adi-contacts.csv contacts.csv phone.vcf Connections.csv
+</code></pre>
+<p>For each person it picks the channel to reach them on (WhatsApp if they have a mobile, then LinkedIn, then email) and writes the personal lines from facts in the export only (their company and title). Nothing is invented.</p>
+<h2>2. Personal page for every prospect</h2>
+<pre><code class="language-bash">python3 tools/push_prospects.py adi-contacts.csv adi-links.csv
+</code></pre>
+<p>Every person gets their own page, https://hello.jointantra.com/adi/?r=TOKEN, which opens with their name, their company and their personal line above the fold, and the button "Sign me up for the trial already, Adi". Link previews in WhatsApp and LinkedIn are personal too. Tokens never change on re-runs.</p>
+<h2>3. Review, then load into Tantra</h2>
+<ol>
+<li>The sender reads adi-links.csv and deletes anyone they would not message personally. This is the approval of the batch.</li>
+<li>The rows load into the pipeline <strong>Tantra referral funnel</strong>, stage <strong>Invited to try</strong>, with custom fields <code>channel</code>, <code>link</code>, <code>why</code> and <code>sender</code> (loaded by our build session through Tantra's deal import until gap G12 gives the team an Import button).</li>
+<li>Entering the stage starts that sender's sequence.</li>
+</ol>
+<h2>4. The automation (one sequence per team member)</h2>
+<p>Live in Tantra: <strong>Tantra referral funnel: Adi</strong> (stage Invited to try). Each sender gets a copy pinned to their own accounts until gap G13 lets one sequence send from each deal owner's accounts.</p>
+<table>
+<thead>
+<tr>
+<th>Day</th>
+<th>Step</th>
+<th>Channel and account</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Message 1 (OUTREACH.md)</td>
+<td>WhatsApp, LinkedIn or email, whichever <code>channel</code> says, from the sender's own account</td>
+</tr>
+<tr>
+<td>2</td>
+<td>SMS with the page link and STOP line</td>
+<td>Tantra's numbers; Tantra applies country rules (US and Canada need consent; India and the UK only as a WhatsApp fallback)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Nudge</td>
+<td>Same channel as message 1</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Last nudge with the setup call link</td>
+<td>Same channel</td>
+</tr>
+</tbody>
+</table>
+<p>Every step stops the moment the person replies, and sends only 10:00 to 19:00 India time, Monday to Saturday. Daily caps: WhatsApp 50, LinkedIn 60 messages per account (Tantra's limits).</p>
+<h2>5. Who can send today</h2>
+<table>
+<thead>
+<tr>
+<th>Team member</th>
+<th>WhatsApp</th>
+<th>LinkedIn</th>
+<th>Email</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adi</td>
+<td>Connected</td>
+<td>Connected</td>
+<td>Connected (adi@growthclub.org)</td>
+</tr>
+<tr>
+<td>Ben</td>
+<td></td>
+<td>Connected</td>
+<td></td>
+</tr>
+<tr>
+<td>Bhaskar, Aquila</td>
+<td></td>
+<td>Connected (content engine app)</td>
+<td></td>
+</tr>
+<tr>
+<td>Nelbin, Bharath, Amal, Conor, Scott</td>
+<td>Not connected</td>
+<td>Not connected</td>
+<td>Not connected</td>
+</tr>
+</tbody>
+</table>
+<p>Everyone else connects their accounts at https://usetantra.com/connectors/channels/whatsapp , https://usetantra.com/connectors/channels/linkedin and https://usetantra.com/accounts before their sequence is copied.</p>
+<h2>6. Gaps to build into Tantra (phase 2, PRD section 9c)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Gap</th>
+<th>Where in tantra-crm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G12</td>
+<td>One "Import my contacts" screen: Google Contacts and Other contacts (People API, contacts.readonly and contacts.other.readonly scopes), Gmail correspondents (all pages, not 100), WhatsApp chats (all pages), LinkedIn connections (Unipile relations), vCard upload; merged into one list per team member</td>
+<td>src/google.ts scopes, src/referralFunnel/outreach.ts, new src/contacts/ module, crm-app import page</td>
+</tr>
+<tr>
+<td>G13</td>
+<td>Send from the deal owner's own account: a step sender of "deal owner" that picks that member's WhatsApp, LinkedIn or mailbox</td>
+<td>src/routes/automation.ts:950,990,1007,1109, src/senders.ts:270</td>
+</tr>
+<tr>
+<td>G14</td>
+<td>Approval before a sequence sends: a batch is shown to its owner and sends on one click</td>
+<td>automation runner, around automation.ts:1505</td>
+</tr>
+<tr>
+<td>G15</td>
+<td>AI personal line per contact as a custom field (company, title, recent post), sourced and stored</td>
+<td>src/referralFunnel/ai.ts, src/enrichment/runner.ts</td>
+</tr>
+<tr>
+<td>G16</td>
+<td><code>{{tracked_link}}</code> with our own page and <code>?r=</code> token, plus click and page visit conditions (Watched stage)</td>
+<td>src/tracking/rewrite.ts, render in automation.ts:426, failedCondition automation.ts:489</td>
+</tr>
+<tr>
+<td>G17</td>
+<td>Contact owner per team member, with first owner wins across the workspace</td>
+<td>migrations 0020 contacts, src/routes/inbound.ts</td>
+</tr>
+<tr>
+<td>G18</td>
+<td>SMS number per team member, and an email daily cap per sender</td>
+<td>src/routes/sms.ts:40-80, automation.ts:1095-1120</td>
+</tr>
+<tr>
+<td>G19</td>
+<td>Signed outbound webhook with the recipient token and sender, so Tantra can push each new prospect's page details itself</td>
+<td>automation.ts:1156-1168</td>
+</tr>
+</tbody>
+</table></div></details>
