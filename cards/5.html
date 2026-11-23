@@ -1,0 +1,146 @@
+<details class="doc" open><summary>TRIAL_SEQUENCES.md</summary><div class="md"><h1>Tantra referral funnel: sequences after the trial starts</h1>
+<p>The trial is one sign up with a card that turns on both apps: the main Tantra app (usetantra.com) and Tantra (crm.usetantra.com). Messages signed by the inviter that go from their own LinkedIn or WhatsApp wait in the inviter's daily approval queue (one click per batch). Email copies go from the Tantra team mailbox, signed by the inviter. Each message has one action. These replace the billing kit's own welcome mail for this funnel (PRD gap G9).</p>
+<p>Stop rules for every sequence: the person replies (a human takes over), books (skip the "book" nudges), cancels the trial (go to sequence D), or opts out (stop everything).</p>
+<h2>A. Trial started, no call booked yet</h2>
+<table>
+<thead>
+<tr>
+<th>When</th>
+<th>Channel</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10 minutes after activation</td>
+<td>Email + WhatsApp</td>
+<td>"You're in, {first_name}. Your 7 days of Tantra started just now, everything is switched on, and $30 of usage credits are in your account for calls, numbers and AI. The fastest way to get value is a 20 minute setup call with our team, and we'll build your first campaign with you: {booking_link}"</td>
+</tr>
+<tr>
+<td>24 hours</td>
+<td>WhatsApp or LinkedIn</td>
+<td>"Hey {first_name}, did you get a chance to pick a time? We build your first campaign with you on that call: {booking_link}"</td>
+</tr>
+<tr>
+<td>48 hours</td>
+<td>Email</td>
+<td>Subject: "Your first campaign in 20 minutes". "Here's what we'll do on the call: connect your LinkedIn and inbox, load 50 of your best leads, and write the first message with you. Pick a time: {booking_link}"</td>
+</tr>
+<tr>
+<td>4 days</td>
+<td>WhatsApp</td>
+<td>"Half your trial left, {first_name}. Want me to just send you a time that works? Reply with a day."</td>
+</tr>
+</tbody>
+</table>
+<h2>B. Call booked</h2>
+<table>
+<thead>
+<tr>
+<th>When</th>
+<th>Channel</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>On booking</td>
+<td>Email (calendar invite) + WhatsApp</td>
+<td>"Booked for {call_time}. Before the call, connect your LinkedIn here so we can start straight away: {connect_link}"</td>
+</tr>
+<tr>
+<td>24 hours before</td>
+<td>Email</td>
+<td>"Tomorrow at {call_time}. Bring one offer you want more meetings for."</td>
+</tr>
+<tr>
+<td>1 hour before</td>
+<td>WhatsApp or SMS</td>
+<td>"See you in an hour: {meeting_link}"</td>
+</tr>
+<tr>
+<td>Missed call, 15 minutes after</td>
+<td>WhatsApp</td>
+<td>"Looks like we missed each other. Here's a new time if that's easier: {booking_link}"</td>
+</tr>
+</tbody>
+</table>
+<h2>C. Daily one thing (days 1 to 7, everyone on a trial)</h2>
+<p>One short email a day, each with one link straight to the screen in the app. A WhatsApp copy goes only on days 1, 3 and 6.</p>
+<table>
+<thead>
+<tr>
+<th>Day</th>
+<th>Subject</th>
+<th>The one thing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Connect your accounts</td>
+<td>Connect LinkedIn, your inbox and WhatsApp</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Bring in your leads</td>
+<td>Import a list or let Tantra find and enrich 50 leads</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Your first campaign</td>
+<td>Approve the AI written first messages and send the first batch</td>
+</tr>
+<tr>
+<td>4</td>
+<td>One idea, every network</td>
+<td>Publish one post to every connected network</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Never miss a reply</td>
+<td>Turn on AI reply drafts in the inbox</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Your trial ends tomorrow</td>
+<td>See your numbers so far, and book the day 7 review: {booking_link}</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Day 7 review</td>
+<td>"Here's what Tantra did for you this week: {stats}. Tantra Pro continues tomorrow at $99 a month, or you can cancel here before then: {billing_link}"</td>
+</tr>
+</tbody>
+</table>
+<p><code>{stats}</code> is real numbers from their workspace (messages sent, replies, meetings). If they sent nothing, day 7 says "You haven't sent your first campaign yet. Want us to do it with you?" with the booking link instead.</p>
+<h2>D. Trial ended</h2>
+<table>
+<thead>
+<tr>
+<th>Outcome</th>
+<th>When</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Became paying</td>
+<td>Day 8</td>
+<td>Thank you note from the sender, plus their referral link: "If you know someone who'd use this, here's your link."</td>
+</tr>
+<tr>
+<td>Cancelled</td>
+<td>On cancel</td>
+<td>"Thanks for giving it a go, {first_name}. What was the one thing that didn't work for you?" One question and nothing else. The answer goes to the feedback log.</td>
+</tr>
+<tr>
+<td>Card failed</td>
+<td>On failure</td>
+<td>"Your card didn't go through. Everything keeps working for now, but please update it here within 10 days so nothing pauses: {billing_link}"</td>
+</tr>
+</tbody>
+</table>
+<h2>Pipeline stages</h2>
+<p>The funnel's pipeline in Tantra is <strong>Tantra referral funnel</strong>:</p>
+<p>Invited, Replied, Watched, Trial started, Call booked, Call done, Paying (won), Not now (lost), Cancelled (lost).</p></div></details>

@@ -1,0 +1,39 @@
+<details class="doc" open><summary>HANDOFF.md</summary><div class="md"><h1>Handoff: Tantra referral funnel, Tantra build (card 6)</h1>
+<p>Paste this into the Tantra build orchestrator session (repo adisuja/tantra-crm, local checkout ~/tantra-crm-main).</p>
+<pre><code>Build the Tantra side of the &quot;Tantra referral funnel&quot; (its own board: https://adisuja.github.io/tantra-referral-funnel-board/, card 6, Adi 23 Nov 2026). Read first, on this Mac:
+/Users/adithyamurali/tantra-referral-funnel/deliverables/01-funnel-prd/PRD.md (sections 9a and 9b are the spec),
+deliverables/05-trial-sequences/TRIAL_SEQUENCES.md and deliverables/03-outreach-messages/OUTREACH.md in the same project. Live pages: https://hello.jointantra.com/adi/?review=1
+
+Goal: one card-backed 7 day trial that turns on BOTH the main Tantra app and Tantra, started from
+https://hello.jointantra.com/{sender}/ and returning to https://hello.jointantra.com/{sender}/welcome/?status=&lt;active|failed|existing&gt;&amp;r=&lt;token&gt;&amp;from=&lt;sender&gt;.
+
+Batch 1, the single activation (PRD 9a), behind flag REFERRAL_KIND (switch referral_kind), PRD gate rows first:
+- G4: public route /start/referral?from=&amp;r= that carries both through Clerk sign up; reads the entitlement first
+  (paying, comped or trial: no checkout, return with status=existing; non-owner member: same, plus a note to ask their owner).
+- G7: the plan is Tantra Pro, $99 a month after the 7 day trial (Adi 23 Nov). Add that live Dodo product and a live checkout path,
+  and make it the plan both apps read as paid (today's CRM plan is &quot;Tantra&quot; at USD 4.99, tantraPlan.ts:26; startPlan is test mode only, tantraPlan.ts:171-188).
+- G2 + G8: checkoutUrl (plans.ts:348) takes a 7 day trial, the return URL above and metadata {workspace_id, funnel:&quot;referral&quot;, sender, token}.
+- One trial clock only: Dodo's. Do NOT write workspaces.trial_*; subscription.active already makes the plan active.
+- The webhook moves the deal in pipeline &quot;Tantra referral funnel&quot; (exists in the Tantra Team Account: Invited, Replied, Watched,
+  Trial started, Call booked, Call done, Paying, Not now, Cancelled) owned by the sender, matched by token and checkout email.
+- G9: for funnel referral, skip the kit welcome mail and never fire referral rewards (plans.ts:158-162).
+- G3: register /billing/dodo/webhook at Dodo through the API; hand Adi one short block only if a dashboard click is unavoidable.
+- G11 (Adi 23 Nov): every activation gets USD 30 of usage credits (30,000 credits, 1,000 = USD 1), one balance for the whole app
+  (calls, phone number purchases, SMS, AI chat usage, enrichment). credit_grants kind referral_trial, once per workspace, test workspaces 0,
+  every usage charge draws from it; the Dodo Pro product and checkout carry it as the included benefit, clawed back on refund.
+- G10: booking embed accepts name and email for prefill; booking matched to the invite by utm_content token.
+- Main app (request only, never commit to Usetantra/*): add G6 (no second Pro trial for someone who activated here) to
+  docs/crm/requests/MAIN_APP_REQUEST_2026_11_18_ENTITLEMENT.md and confirm G5 (entitlement read) status with the dev team.
+
+Batch 2, the &quot;referral&quot; funnel kind (PRD 9b): FUNNEL_KINDS, ENGINE_KINDS, KIND_TEXT, method/network/kind.md, KIND_SPECS,
+kindWords, kindSizing, typeDefaults; a referral template (invite, welcome, booked pages; booking page; the pipeline; the
+sequences in TRIAL_SEQUENCES.md); a page per team member; compose and approve and send reused from src/referralFunnel
+with the pipeline, deal source and invite URL made settable; first owner wins per contact; daily caps; follow ups and
+messages 2 and 3 go through the sender's daily approval queue.
+
+Done means: on the QA workspace with test addresses only, a new test account goes invite page, checkout (Dodo test),
+welcome with status=active, books the setup call, and its deal moves Invited to Trial started to Call booked owned by
+the sender; the main app shows the paid state for that Clerk user (or the request is logged as the only gap). E2E tests
+per step, one Deploy per batch, PR links and screenshots back on card 6 of the referral funnel board. Rules: no em or en dashes, users never see
+&quot;CRM&quot; or ids, no live charges, never send to real contacts in tests.
+</code></pre></div></details>

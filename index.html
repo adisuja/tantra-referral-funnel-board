@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Tantra referral funnel: task board</title>
+<link rel="icon" href="mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b0d12;--paper:#f7f8fb;--white:#fff;--slate:#5b6472;--line:#e2e8f0;--volt:#6d4aff;--volt-deep:#4b2fd6;--lilac:#f1efff;
+--need:#b45309;--need-bg:#fff7ed;--ready:#047857;--ready-bg:#ecfdf5;--wait:#475569;--wait-bg:#f1f5f9;--done:#4b2fd6;--done-bg:#f1efff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 24px 80px}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+header.top{display:flex;align-items:center;gap:10px;color:var(--slate)}
+header.top img{width:22px;height:22px}header.top b{color:var(--ink)}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.1;margin:22px 0 10px;letter-spacing:-.02em}
+.lead{max-width:720px;color:var(--slate);margin:0 0 6px}
+.lead a,.links a{color:var(--volt-deep)}
+.links{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 24px;font-size:14px}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.stat{border:1px solid var(--line);background:var(--white);border-radius:10px;padding:10px 14px;display:flex;align-items:baseline;gap:8px;cursor:pointer;font:inherit;color:inherit}
+.stat b{font-size:22px}.stat span{color:var(--slate);font-size:13px}
+.stat.on{outline:2px solid var(--volt);outline-offset:-1px}
+.stat.need b{color:var(--need)}.stat.ready b{color:var(--ready)}.stat.done b{color:var(--done)}
+.panels{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;margin-bottom:28px}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.panel h3{margin:0 0 8px;font-size:15px}.panel{margin-bottom:20px}.plain{margin:0;padding-left:18px;font-size:14px}.plain li{margin:4px 0}.plain a{color:var(--volt-deep)}.plain code{font:12.5px "JetBrains Mono",monospace}
+.panel ol{margin:0;padding-left:20px}.panel li{margin:5px 0;font-size:14px}
+.benches{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bench{display:flex;flex-direction:column;border-left:3px solid var(--volt);padding:2px 0 2px 10px}
+.bench b{font-size:20px}.bench span{font-size:13px}.bench small{color:var(--slate);font-size:12px}
+.panel .foot{color:var(--slate);font-size:12px;margin:10px 0 0}
+.toolbar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line);margin-bottom:8px}
+.chip{border:1px solid var(--line);background:var(--white);border-radius:999px;padding:6px 12px;font:500 13px Inter,sans-serif;color:var(--ink);cursor:pointer}
+.chip.on{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.search{flex:1;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font:inherit;font-size:14px;min-width:200px;background:var(--white)}
+.group>h2 small{color:var(--volt);margin-left:6px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:12px;margin:8px 0;overflow:hidden;scroll-margin-top:70px}
+.card:target{outline:2px solid var(--volt)}
+.head{all:unset;box-sizing:border-box;display:grid;grid-template-columns:56px minmax(0,1fr) auto auto 18px;gap:12px;align-items:center;width:100%;padding:14px 16px;cursor:pointer}
+.head:focus-visible{outline:2px solid var(--volt);outline-offset:-2px}
+.tid{font:600 12px "JetBrains Mono",monospace;color:var(--volt-deep)}
+.title{font-weight:600}
+.pill{font:600 11px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.04em;padding:4px 8px;border-radius:6px;white-space:nowrap}
+.pill.need{color:var(--need);background:var(--need-bg)}.pill.ready{color:var(--ready);background:var(--ready-bg)}
+.pill.wait,.pill.prog,.pill.rev{color:var(--wait);background:var(--wait-bg)}.pill.done{color:var(--done);background:var(--done-bg)}
+.chev{width:9px;height:9px;border-right:2px solid var(--slate);border-bottom:2px solid var(--slate);transform:rotate(45deg);margin-top:-4px;transition:transform .2s}
+.card.open .chev{transform:rotate(-135deg);margin-top:4px}
+.body{padding:0 16px 16px 84px;font-size:14px}
+.body h4{margin:14px 0 4px;font-size:12px;font-family:"JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--slate)}
+.body ul{margin:0;padding-left:18px}.body li{margin:3px 0}
+.body a{color:var(--volt-deep);word-break:break-word}
+.body code{font:12.5px "JetBrains Mono",monospace;background:var(--paper);padding:1px 5px;border-radius:4px}
+.brief{margin:0;font-size:15px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;color:var(--slate);font-size:13px;margin-bottom:10px}
+.rules{border:2px solid var(--volt);background:var(--lilac)}.rules h3{color:var(--volt-deep)}
+.model-box{background:var(--lilac);border:1px solid #d9d2ff;border-radius:8px;padding:2px 12px 10px;margin-top:12px}.model-box h4{color:var(--volt-deep)}
+.next{background:var(--paper);border-left:3px solid var(--volt);padding:8px 12px;border-radius:6px;margin:4px 0 8px}
+.steps{padding-left:20px;margin:6px 0}.steps li{margin:8px 0;line-height:1.55}
+.owner{font:600 11px "JetBrains Mono",monospace;padding:2px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;margin-right:6px;white-space:nowrap}
+.team-box{border:1px solid #c7d2fe;background:#eef2ff;border-radius:10px;padding:10px 14px;margin:12px 0}.team-box h4{margin-top:0}
+.kind{font:600 10.5px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;border-radius:4px;background:#fff;border:1px solid #fed7aa;color:var(--need);margin-right:4px}
+.content{border:1px solid var(--line);border-radius:10px;padding:4px 12px;background:#fff}
+.doc{border-bottom:1px solid var(--line);padding:6px 0}.doc:last-child{border-bottom:0}.doc>summary{cursor:pointer;font:600 13px "JetBrains Mono",monospace;color:var(--volt-deep);padding:6px 0}
+.md{font-size:14px;line-height:1.6;overflow-wrap:anywhere}.md h1{font-size:20px}.md h2{font-size:17px;margin-top:18px}.md h3{font-size:15px}
+.md table{border-collapse:collapse;display:block;overflow-x:auto;font-size:13px;margin:10px 0}.md th,.md td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}.md th{background:var(--lilac)}
+.md pre{background:var(--ink);color:#e7e9f2;padding:10px;border-radius:8px;overflow:auto;font-size:12.5px}.md pre code{background:none;color:inherit}
+.files{columns:2;font-size:13px}.muted{color:var(--slate);font-size:13px}
+.waiting{border:2px solid #fed7aa;background:var(--need-bg)}.wchips{display:flex;flex-wrap:wrap;gap:6px}.wchip{font:600 12px "JetBrains Mono",monospace;text-decoration:none;color:var(--need);background:#fff;border:1px solid #fed7aa;border-radius:999px;padding:4px 10px}.wchip small{color:var(--slate)}
+@media (max-width:760px){.files{columns:1}}
+.need-box{background:var(--need-bg);border:1px solid #fed7aa;border-radius:8px;padding:2px 12px 10px;margin-top:12px}
+.need-box h4{color:var(--need)}
+.dep{font:600 12px "JetBrains Mono",monospace;color:var(--volt-deep);text-decoration:none}
+.empty{color:var(--slate);padding:20px 0;display:none}
+.gnote{margin:-6px 0 10px}.group>h2{font-size:13px;font-family:"JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--slate);margin:26px 0 10px;font-weight:600}.g-p0>h2,.g-p0>h2 small{color:#b42318}
+.prio{display:inline-block;font:600 10.5px "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:5px;margin-right:8px;vertical-align:1px}
+.prio.p-p0{background:#fef3f2;color:#b42318}.prio.p-p1{background:#fff7ed;color:#b45309}.prio.p-p2{background:var(--wait-bg);color:var(--wait)}
+.card.is-done{opacity:.72}.card.is-done .title{text-decoration:none}
+footer{color:var(--slate);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:760px){.panels{grid-template-columns:minmax(0,1fr)}.head{grid-template-columns:44px minmax(0,1fr) 14px}.head .pill,.head .owner{grid-column:2;justify-self:start}.chev{grid-row:1;grid-column:3}.body{padding:0 14px 14px}.toolbar{position:static;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;flex-direction:row}.toolbar::-webkit-scrollbar{display:none}.chip{flex:0 0 auto}.search{min-width:150px;flex:0 0 150px;margin-left:0}.card{scroll-margin-top:12px}}
+</style></head>
+<body><div class="wrap">
+<header class="top mono"><img src="mark.png" alt=""><b>Tantra</b> <span>Referral funnel</span> <span>Updated 2026-11-23</span></header>
+<h1>Tantra referral funnel: tasks</h1>
+<p class="lead">Every task for the funnel, ordered by what blocks the launch: launch blockers first, finished cards at the bottom. 1 of 7 done. Start with <a href="#item-40">card 40, the launch audit</a>. Open a card: it holds everything for that task, the deliverable, what I need from you and the review links.</p>
+<div class="panel waiting"><h3>Waiting on you: 4 steps in 4 cards</h3><p class="muted">Open a card to see exactly what I need. Already decided: Tantra Pro $99 a month after a 7 day trial; USD 30 of usage credits; one activation for both apps; Adi records the video; whole team with own links; approve the batch and Tantra sends.</p><div class="wchips"><a class="wchip" href="#item-1">1 <small>1</small></a><a class="wchip" href="#item-3">3 <small>1</small></a><a class="wchip" href="#item-4">4 <small>1</small></a><a class="wchip" href="#item-6">6 <small>1</small></a></div></div>
+<div class="panel rules"><h3>Standing rules for every task (Adi)</h3><ol><li>THE BOARD IS THE ONE PLACE: everything for a task lives inside its card.</li><li>SEPARATE FROM THE ENTERPRISE WEBINAR FUNNEL (Adi, 23 Nov): nothing of this funnel goes on the Enterprise webinar board or its site.</li><li>No em or en dashes anywhere. No AI slop. Never invent a stat, testimonial or result.</li><li>Personal contacts only: never the cold calendar list or a bought list. Nothing is sent without the sender&#x27;s approval.</li></ol></div>
+<div class="panel"><h3>References for every task</h3><ul class="plain"><li><a href="https://hello.jointantra.com/?review=1&amp;v=1795426511" target="_blank" rel="noopener">Invite pages</a></li></ul></div>
+<div class="toolbar"><input class="search" type="search" placeholder="Search tasks" aria-label="Search tasks"></div>
+<section class="group g-p0"><h2>Launch blockers <small>5</small></h2><p class="muted gnote">Nothing goes live until these are done. In launch order.</p><article class="card" id="item-1" data-search="1 funnel prd: the tantra referral funnel end to end the whole funnel in one prd (prd-development method): who sends, the page, the single activation for both apps, the trial sequences, the pipeline, phase 2 as a funnel kind in tantra. adi">
+<button class="head" aria-expanded="false" aria-controls="item-1-body">
+<span class="tid">1</span><span class="title"><span class="prio p-p0">Launch blocker</span>Funnel PRD: the Tantra referral funnel end to end</span>
+<span class="owner">Adi</span><span class="pill wait">Waiting on Adi</span><span class="chev" aria-hidden="true"></span></button>
+<div class="body" id="item-1-body" hidden><p class="next"><b>Next step:</b> Adi: who sends in week 1.</p><div class="need-box"><h4>What I need from you</h4><ol class="steps"><li><span class="kind k-decision">Decision</span> Which team members send in week 1, and how many contacts each (the PRD assumes 50 each).</li></ol></div><h4>Output</h4><p>PRD written and reviewed by an independent critic (15 findings, all fixed). Section 9a: the single activation design and gaps G2 to G11. Section 9b: the referral funnel kind in Tantra.</p><h4>The deliverable</h4><div class="content" data-src="cards/1.html"><p class="muted">Loading...</p></div><h4>Brief</h4><p class="brief">The whole funnel in one PRD (prd-development method): who sends, the page, the single activation for both apps, the trial sequences, the pipeline, phase 2 as a funnel kind in Tantra.</p><h4>Inputs given</h4><ul><li>Adi 23 Nov: team members message their personal contacts with their own link; page with Adi&#x27;s video, 7 day trial, then a call</li><li>Adi 23 Nov: one card activation turns on the main Tantra app and Tantra together</li><li>Adi 23 Nov: Tantra Pro, $99 a month after the 7 day trial, plus USD 30 of usage credits for the whole app (calls, numbers, AI chat, all usage), built into the app and Dodo</li><li>Adi 23 Nov: Adi records the video; whole team sends with own links; Tantra sends each batch after the sender approves it</li></ul></div></article>
+<article class="card" id="item-2" data-search="2 invite pages on hello.jointantra.com: one per team member a page per team member: who invited you, adi&#x27;s video, one trial button, the next 7 days, then the setup call and the booked page. adi">
+<button class="head" aria-expanded="false" aria-controls="item-2-body">
+<span class="tid">2</span><span class="title"><span class="prio p-p0">Launch blocker</span>Invite pages on hello.jointantra.com: one per team member</span>
+<span class="owner">Adi</span><span class="pill prog">In progress</span><span class="chev" aria-hidden="true"></span></button>
+<div class="body" id="item-2-body" hidden><p class="next"><b>Next step:</b> Waits on card 6 (activation) and card 4 (video file).</p><h4>Live links: scripts, pages and docs</h4><ul><li><a href="https://hello.jointantra.com/adi/?review=1&amp;v=1795426590" target="_blank" rel="noopener">Invite page (Adi), review mode</a></li><li><a href="https://hello.jointantra.com/bhaskar/?review=1&amp;v=1795426590" target="_blank" rel="noopener">Invite page (Bhaskar), review mode</a></li><li><a href="https://hello.jointantra.com/?review=1&amp;v=1795426590" target="_blank" rel="noopener">Invite page, no sender</a></li><li><a href="https://hello.jointantra.com/adi/?v=1795426590" target="_blank" rel="noopener">Invite page as the public sees it</a></li><li><a href="https://hello.jointantra.com/adi/welcome/?status=active&amp;v=1795426590" target="_blank" rel="noopener">After checkout: trial on, book the call</a></li><li><a href="https://hello.jointantra.com/adi/welcome/?status=failed&amp;review=1&amp;v=1795426590" target="_blank" rel="noopener">After checkout: card failed</a></li><li><a href="https://hello.jointantra.com/adi/welcome/?status=existing&amp;v=1795426590" target="_blank" rel="noopener">Already uses Tantra: book only</a></li><li><a href="https://hello.jointantra.com/adi/booked/?start=2026-11-25T10:30:00Z&amp;v=1795426590" target="_blank" rel="noopener">Call booked</a></li><li><a href="https://crm.usetantra.com/book/tantra/tantra-setup-call?v=1795426590" target="_blank" rel="noopener">Setup call booking page</a></li></ul><h4>Output</h4><p>Live on <a href="https://hello.jointantra.com" target="_blank" rel="noopener">https://hello.jointantra.com</a> for the Tantra team and 9 team members, three states each (invite, welcome, booked) plus failed and existing account states; noindex. The trial button shows in review mode only until the single activation works for both apps (card 6). Token and sender carry through to the booking.</p><h4>The deliverable</h4><div class="content" data-src="cards/2.html"><p class="muted">Loading...</p></div><h4>Brief</h4><p class="brief">A page per team member: who invited you, Adi&#x27;s video, one trial button, the next 7 days, then the setup call and the booked page.</p></div></article>
+<article class="card" id="item-3" data-search="3 outreach messages: first message, follow ups, sending rules adi&#x27;s first message tightened, with ai personalisation that only writes a sourced fact, two follow ups, reply handling and the sending rules. adi">
+<button class="head" aria-expanded="false" aria-controls="item-3-body">
+<span class="tid">3</span><span class="title"><span class="prio p-p0">Launch blocker</span>Outreach messages: first message, follow ups, sending rules</span>
+<span class="owner">Adi</span><span class="pill wait">Waiting on Adi</span><span class="chev" aria-hidden="true"></span></button>
+<div class="body" id="item-3-body" hidden><p class="next"><b>Next step:</b> Adi approves message 1.</p><div class="need-box"><h4>What I need from you</h4><ol class="steps"><li><span class="kind k-decision">Decision</span> Approve the first message wording.</li></ol></div><h4>Output</h4><p>Message 1 for LinkedIn, WhatsApp and email with fallbacks; messages 2 and 3; reply table; daily caps and first owner wins.</p><h4>The deliverable</h4><div class="content" data-src="cards/3.html"><p class="muted">Loading...</p></div><h4>Brief</h4><p class="brief">Adi&#x27;s first message tightened, with AI personalisation that only writes a sourced fact, two follow ups, reply handling and the sending rules.</p></div></article>
+<article class="card" id="item-4" data-search="4 video: adi records the 4 minute walkthrough adi on camera plus a screen recording: why you are seeing this, the problem, what tantra does, your first 7 days, the ask for feedback. adi">
+<button class="head" aria-expanded="false" aria-controls="item-4-body">
+<span class="tid">4</span><span class="title"><span class="prio p-p0">Launch blocker</span>Video: Adi records the 4 minute walkthrough</span>
+<span class="owner">Adi</span><span class="pill wait">Waiting on Adi</span><span class="chev" aria-hidden="true"></span></button>
+<div class="body" id="item-4-body" hidden><p class="next"><b>Next step:</b> Adi records the video.</p><div class="need-box"><h4>What I need from you</h4><ol class="steps"><li><span class="kind k-action">Action</span> Record the script on <a href="https://teleprompter.usetantra.com" target="_blank" rel="noopener">https://teleprompter.usetantra.com</a> and send the file; it goes into the page config (hello.video_url).</li></ol></div><h4>Output</h4><p>Script ready, about 4 minutes.</p><h4>The deliverable</h4><div class="content" data-src="cards/4.html"><p class="muted">Loading...</p></div><h4>Brief</h4><p class="brief">Adi on camera plus a screen recording: why you are seeing this, the problem, what Tantra does, your first 7 days, the ask for feedback.</p></div></article>
+<article class="card" id="item-6" data-search="6 tantra build: single activation for both apps, credits, and the referral funnel kind build into tantra and dodo payments: one card checkout for tantra pro ($99 a month after 7 days) that turns on both apps, usd 30 of usage credits, then the referral funnel kind anyone can launch. adi">
+<button class="head" aria-expanded="false" aria-controls="item-6-body">
+<span class="tid">6</span><span class="title"><span class="prio p-p0">Launch blocker</span>Tantra build: single activation for both apps, credits, and the referral funnel kind</span>
+<span class="owner">Adi</span><span class="pill wait">Waiting on Adi</span><span class="chev" aria-hidden="true"></span></button>
+<div class="body" id="item-6-body" hidden><p class="next"><b>Next step:</b> Adi starts the Tantra build with the handoff prompt.</p><div class="need-box"><h4>What I need from you</h4><ol class="steps"><li><span class="kind k-action">Action</span> Paste the handoff prompt in this card into the Tantra build orchestrator session to start the build.</li></ol></div><h4>Output</h4><p>Handoff prompt ready (gaps G2 to G11, batch 1 activation, batch 2 funnel kind). The main app team must ship G5 and G6 before the trial button goes public.</p><h4>The deliverable</h4><div class="content" data-src="cards/6.html"><p class="muted">Loading...</p></div><h4>Brief</h4><p class="brief">Build into Tantra and Dodo Payments: one card checkout for Tantra Pro ($99 a month after 7 days) that turns on both apps, USD 30 of usage credits, then the referral funnel kind anyone can launch.</p></div></article></section>
+<section class="group g-p1"><h2>Launch week <small>2</small></h2><p class="muted gnote">Needed before the first invites go out.</p><article class="card" id="item-5" data-search="5 trial sequences: from activation to paying what each person receives after the trial starts: book nudges, call reminders, a daily one thing, the day 7 review and the trial end. adi">
+<button class="head" aria-expanded="false" aria-controls="item-5-body">
+<span class="tid">5</span><span class="title"><span class="prio p-p1">Launch week</span>Trial sequences: from activation to paying</span>
+<span class="owner">Adi</span><span class="pill prog">In progress</span><span class="chev" aria-hidden="true"></span></button>
+<div class="body" id="item-5-body" hidden><p class="next"><b>Next step:</b> Built in Tantra after card 6.</p><h4>Output</h4><p>Sequences A to D written; billing kit mails replaced for this funnel (gap G9). Built in Tantra with the activation (card 6).</p><h4>The deliverable</h4><div class="content" data-src="cards/5.html"><p class="muted">Loading...</p></div><h4>Brief</h4><p class="brief">What each person receives after the trial starts: book nudges, call reminders, a daily one thing, the day 7 review and the trial end.</p></div></article>
+<article class="card is-done" id="item-7" data-search="7 tantra setup: pipeline and setup call booking page the funnel&#x27;s pipeline and the 20 minute setup call in the tantra team account. adi">
+<button class="head" aria-expanded="false" aria-controls="item-7-body">
+<span class="tid">7</span><span class="title"><span class="prio p-p1">Launch week</span>Tantra setup: pipeline and setup call booking page</span>
+<span class="owner">Adi</span><span class="pill done">Done</span><span class="chev" aria-hidden="true"></span></button>
+<div class="body" id="item-7-body" hidden><h4>Live links: scripts, pages and docs</h4><ul><li><a href="https://crm.usetantra.com/book/tantra/tantra-setup-call?v=1795426590" target="_blank" rel="noopener">Setup call booking page</a></li></ul><h4>Output</h4><p>Pipeline Tantra referral funnel (Invited, Replied, Watched, Trial started, Call booked, Call done, Paying, Not now, Cancelled). Group Calendar Tantra setup call, 20 minutes, Conor and Scott, bookings land in Call booked.</p><h4>The deliverable</h4><div class="content" data-src="cards/7.html"><p class="muted">Loading...</p></div><h4>Brief</h4><p class="brief">The funnel&#x27;s pipeline and the 20 minute setup call in the Tantra Team Account.</p></div></article></section>
+<p class="empty">No task matches.</p>
+<footer>Built from tasks/tasks.json, build 1795426590. No credentials or personal data on this page. Everything for a task is inside its card.</footer>
+</div>
+<script>
+const cards=[...document.querySelectorAll('.card')];
+function load(c){const el=c.querySelector('.content');if(!el||el.dataset.done)return;el.dataset.done=1;fetch(el.dataset.src+'?v='+Date.now()).then(r=>r.ok?r.text():Promise.reject()).then(h=>{el.innerHTML=h;el.querySelectorAll('a[href^="files/"]').forEach(a=>a.setAttribute('href','cards/'+a.getAttribute('href')))}).catch(()=>{el.innerHTML='<p class="muted">Could not load this deliverable. Reload the page.</p>'})}
+function toggle(c,open){const b=c.querySelector('.head'),body=c.querySelector('.body');open=open??body.hidden;body.hidden=!open;c.classList.toggle('open',open);b.setAttribute('aria-expanded',open);if(open)load(c)}
+cards.forEach(c=>c.querySelector('.head').addEventListener('click',()=>{toggle(c);if(!c.querySelector('.body').hidden)history.replaceState(null,'','#'+c.id)}));
+document.querySelector('.search').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();let n=0;cards.forEach(c=>{const ok=!q||c.dataset.search.includes(q);c.style.display=ok?'':'none';if(ok)n++});document.querySelector('.empty').style.display=n?'none':'block';document.querySelectorAll('.group').forEach(g=>{g.style.display=[...g.querySelectorAll('.card')].some(c=>c.style.display!=='none')?'':'none'})});
+function openHash(){const c=location.hash&&document.getElementById(location.hash.slice(1));if(c&&c.classList.contains('card')){toggle(c,true);c.scrollIntoView({block:'start'})}}
+window.addEventListener('hashchange',openHash);openHash();
+</script></body></html>

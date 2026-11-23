@@ -1,0 +1,39 @@
+<details class="doc" open><summary>README.md</summary><div class="md"><h1>Invite pages</h1>
+<p>Live: https://hello.jointantra.com (Cloudflare Worker <code>tantra-referral-funnel</code>, account Growthcluborg). Source: <code>site/</code> in this project; config <code>site/config.json</code> (key <code>hello</code>).</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No sender</td>
+<td>https://hello.jointantra.com/</td>
+</tr>
+<tr>
+<td>Invited by a team member</td>
+<td>https://hello.jointantra.com/{sender}/?r={token}</td>
+</tr>
+<tr>
+<td>After checkout, trial on</td>
+<td>https://hello.jointantra.com/{sender}/welcome/?status=active</td>
+</tr>
+<tr>
+<td>Card failed</td>
+<td>https://hello.jointantra.com/{sender}/welcome/?status=failed</td>
+</tr>
+<tr>
+<td>Already uses Tantra</td>
+<td>https://hello.jointantra.com/{sender}/welcome/?status=existing</td>
+</tr>
+<tr>
+<td>Call booked</td>
+<td>https://hello.jointantra.com/{sender}/booked/?start={iso}</td>
+</tr>
+</tbody>
+</table>
+<p>Senders: adi, bhaskar, nelbin, aquila, bharath, ben, amal, conor, scott.</p>
+<p>Build and deploy: <code>node site/build.mjs</code>, then <code>cd worker &amp;&amp; CLOUDFLARE_ACCOUNT_ID=e51d1fda77a8f98fb670b2c106bd8a33 npx wrangler deploy</code>.</p>
+<p>The trial button shows in public only once <code>hello.trial_url</code> is set, which waits on the single activation (card 6).</p></div></details>

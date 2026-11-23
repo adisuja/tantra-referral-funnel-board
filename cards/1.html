@@ -1,0 +1,263 @@
+<details class="doc" open><summary>PRD.md</summary><div class="md"><h1>PRD: Tantra referral funnel</h1>
+<p><strong>Status:</strong> draft for Adi's review, 23 Nov 2026. <strong>Owner:</strong> Adi. <strong>Project:</strong> ~/tantra-referral-funnel, board https://adisuja.github.io/tantra-referral-funnel-board/ (separate from the Enterprise webinar funnel).
+<strong>Method:</strong> prd-development template (10 sections). Gaps are tagged inline: 🔶 Assumption, 🔵 Open question.
+<strong>Name everywhere a person reads it:</strong> "Tantra referral funnel" (Adi, 23 Nov). Tantra funnel kind key: <code>referral</code>. The partner flow already in Tantra ("Invite your partners", PRD_2026_11_16_REFERRAL_FUNNEL, flag <code>REFERRAL_FUNNEL</code>, pipeline "Tantra referrals") is the partner entry point of this same funnel; this PRD adds the team's personal contacts entry point and the single activation both share.</p>
+<h2>1. Executive summary</h2>
+<p>We launch the Tantra app through the people who already know us. Every team member sends a short, personal, AI-personalised message to their own contacts on LinkedIn, WhatsApp or email. It links to their own copy of one page: a prerecorded video from Adi, a 7 day free trial button, then a call booked with our team. One sign up with a card turns on both apps (the main Tantra app and Tantra). A week of sequences takes each person from trial to first campaign to paying. We run it by hand in Tantra first (phase 1), then build it into Tantra as a funnel type anyone can launch (phase 2).</p>
+<h2>2. Problem statement</h2>
+<ul>
+<li><strong>Who:</strong> the Tantra team, launching a new product with no reviews, case studies or install base for the app itself.</li>
+<li><strong>Problem:</strong> cold channels (cold email, cold calendar, ads) convert worst exactly when a product is new and unproven. The warmest audience we have, people who know Adi and the team personally, is being reached ad hoc, if at all, with no tracking and no follow up.</li>
+<li><strong>Why it hurts:</strong> we lose the cheapest early users and, more importantly, the honest feedback we need before opening the app up.</li>
+<li><strong>Evidence:</strong> 🔶 Assumption: warm messages to personal contacts get far higher reply rates than cold outreach. We measure our own rate in phase 1 before projecting anything (own-data-over-benchmarks rule).</li>
+</ul>
+<h2>3. Target users</h2>
+<ul>
+<li><strong>Primary (receiver):</strong> a founder, revenue leader or operator who knows one of us personally. Job to be done: "Help me see quickly whether this is worth my time, without a sales pitch from a friend."</li>
+<li><strong>Secondary (sender):</strong> a Tantra team member (Adi, Bhaskar, Nelbin, Aquila, Bharath, Ben, Amal, Conor, Scott). Job to be done: "Let me reach the people I know in an hour, with messages that sound like me, and see who acted."</li>
+</ul>
+<h2>4. Strategic context</h2>
+<ul>
+<li><strong>Goal:</strong> first paying Tantra users and structured product feedback before the public launch.</li>
+<li><strong>Why now:</strong> the app is ready for launch, and the partner referral funnel and webinar funnel both already exist in Tantra, so most of the building blocks are built.</li>
+<li><strong>Reuse:</strong> booking pages, tracked links with recipient tokens, sequences and the send queue, Unipile LinkedIn and WhatsApp, mailboxes, enrichment, pipelines, AI drafts per contact and batch approval (the referral funnel's compose and send routes).</li>
+</ul>
+<h2>5. Solution overview</h2>
+<h3>The flow</h3>
+<ol>
+<li><strong>Sender picks contacts</strong> in Tantra from their LinkedIn connections, phone contacts or inbox.</li>
+<li><strong>Tantra enriches</strong> each contact (company and one fact about their current work) and writes message 1 in the sender's voice (OUTREACH.md).</li>
+<li><strong>Sender reads, edits and approves the batch.</strong> Tantra sends it inside the daily limits. Nothing goes without that click.</li>
+<li><strong>Contact opens their link:</strong> <code>https://hello.jointantra.com/{sender}/?r={token}</code>. The page greets them as invited by the sender.</li>
+<li><strong>Page, screen 1:</strong> Adi's video (VIDEO_SCRIPT.md), then one button: "Start your 7 day free trial".</li>
+<li><strong>Trial:</strong> one checkout with a card. A 7 day trial that turns on both the main Tantra app and Tantra (section 9, activation).</li>
+<li><strong>Page, screen 2 (after checkout):</strong> "You're in. Book your setup call", with the booking page embedded and the sender's name on it.</li>
+<li><strong>Sequences</strong> (TRIAL_SEQUENCES.md): book nudges, call reminders, daily one thing, day 7 review, trial end.</li>
+<li><strong>Pipeline "Tantra referral funnel":</strong> Invited, Replied, Watched, Trial started, Call booked, Call done, Paying, Not now, Cancelled. Every deal carries the sender as owner.</li>
+</ol>
+<h3>Page states (each one gets a review link)</h3>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>URL</th>
+<th>What it shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Default (no sender)</td>
+<td><code>/</code></td>
+<td>Video, trial button, "Invited by the Tantra team"</td>
+</tr>
+<tr>
+<td>Invited by a sender</td>
+<td><code>/{sender}/</code></td>
+<td>The same, with the sender's photo, name and "invited you"</td>
+</tr>
+<tr>
+<td>Trial started</td>
+<td><code>/{sender}/welcome</code></td>
+<td>"You're in", booking embed</td>
+</tr>
+<tr>
+<td>Call booked</td>
+<td><code>/{sender}/booked</code></td>
+<td>Time, what to prepare, connect LinkedIn link</td>
+</tr>
+<tr>
+<td>Checkout failed</td>
+<td><code>/{sender}/welcome/?status=failed</code></td>
+<td>"Your card didn't go through", retry button, booking still open</td>
+</tr>
+<tr>
+<td>Already uses Tantra</td>
+<td><code>/{sender}/welcome/?status=existing</code></td>
+<td>Booking only, no trial</td>
+</tr>
+</tbody>
+</table>
+<h2>6. Success metrics</h2>
+<p>Primary: <strong>paying users from the funnel</strong> (trial to paid on day 8).</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Phase 1 target (first 4 weeks)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contacts invited</td>
+<td>🔶 450 (50 per team member)</td>
+</tr>
+<tr>
+<td>Reply rate</td>
+<td>Measured, no target until week 1 data</td>
+</tr>
+<tr>
+<td>Page visit to trial start</td>
+<td>Measured</td>
+</tr>
+<tr>
+<td>Trial start to call booked</td>
+<td>🔶 60%</td>
+</tr>
+<tr>
+<td>Trial to paid</td>
+<td>Measured</td>
+</tr>
+<tr>
+<td>Feedback answers collected</td>
+<td>Every trial user asked on day 7</td>
+</tr>
+</tbody>
+</table>
+<h2>7. Requirements (user stories)</h2>
+<ol>
+<li>As a sender, I see my own page link and my own pipeline view, so I know who I invited and who acted.</li>
+<li>As a sender, I approve every first message before it is sent, and I never send more than my daily limit.</li>
+<li>As a receiver, I see who invited me within the first screen, and I can start the trial without reading anything but the video.</li>
+<li>As a receiver, after checkout I land on the booking step straight away, and my booking is matched to my invite (token as utm_content; name and email prefill needs the booking embed to accept them, G10).</li>
+<li>As a receiver, one sign up gives me the main Tantra app and Tantra, with no second sign up anywhere.</li>
+<li>As Adi, I see the funnel's numbers per sender: invited, replied, visited, trial, booked, paid.</li>
+<li>As a team member, a contact someone else already invited is blocked from my batch.</li>
+</ol>
+<p>Edge cases: a contact who already has a Tantra account (skip the trial and offer the call), a card that fails (sequence D), a contact who replies "stop" (suppressed everywhere), two invites to the same person (first one wins).</p>
+<h2>8. Out of scope</h2>
+<ul>
+<li>Cold lists of any kind (the cold calendar master list, bought lists). This funnel is personal contacts only.</li>
+<li>A reward for the receiver beyond the trial. 🔵 Open question: do we add the D49 referral credits when a team member invites someone?</li>
+<li>Building the funnel type inside Tantra in phase 1. Phase 1 runs on existing Tantra pieces plus a page in this repo.</li>
+</ul>
+<h2>9. Dependencies and risks</h2>
+<h3>9a. Activation: one sign up, both apps (Adi, 23 Nov)</h3>
+<p>Adi's rule: one activation with a card turns on the main Tantra app and Tantra together, then the sequences give access to everything.</p>
+<p><strong>Trial credits (Adi, 23 Nov):</strong> every activation also gets <strong>USD 30 of usage credits</strong> (30,000 credits at the price list, 1,000 credits = USD 1), one balance for the whole app: AI voice calls, SMS, phone number purchases, AI usage in the chat, enrichment and everything else charged by use. Granted once per workspace on activation, recorded in the credits ledger with the reason in words; test workspaces get 0 real credits; never granted twice for one person or one card.</p>
+<p><strong>What already exists (adisuja/tantra-crm, origin/main 30eda7c0):</strong>
+- One Clerk instance for both apps (<code>clerk.usetantra.com</code>). A first sign in to Tantra creates the person's workspace.
+- Tantra owns billing for both apps: the main app is asked (docs/crm/requests/MAIN_APP_REQUEST_2026_11_18_ENTITLEMENT.md) to read <code>GET /intake/entitlement?clerk_user_id=</code> and treat <code>plan == "tantra"</code> as paid.
+- A trial lives on the workspace (<code>workspaces.trial_started_at</code>, <code>trial_ends_at</code>, <code>trial_source</code>, migration 0238) and already counts as a paid plan in <code>src/billing/tantraPlan.ts</code>.
+- The Dodo billing webhook <code>POST /billing/dodo/webhook</code> handles <code>subscription.active</code> (which also fires when a trial saves a card), renewals, failures and cancellations.</p>
+<p><strong>The design:</strong>
+1. The trial button opens <code>https://crm.usetantra.com/start/referral?from={sender}&amp;r={token}</code>.
+2. Signed out: Clerk sign up, then back (the same account works in both apps). Signed in: straight on.
+3. Tantra makes one Dodo checkout for <strong>Tantra Pro, $99 a month after a 7 day trial</strong> (Adi, 23 Nov), with a card. Metadata: <code>workspace_id</code>, <code>funnel: referral</code>, <code>sender</code>, <code>token</code>. It returns to <code>https://hello.jointantra.com/{sender}/welcome/</code>.
+4. <strong>One clock: Dodo's trial.</strong> <code>subscription.active</code> (which fires when the trial saves the card) already makes the plan <code>active</code>, and <code>sourceOf</code> returns paid before it looks at any workspace trial. So no second workspace trial is written (critic, 23 Nov). The webhook only moves the deal to Trial started, owned by the sender, matched by the token and the checkout email.
+5. Both apps read the same entitlement, so both are on. Day 8: Dodo takes the first payment (deal to Paying). A cancel moves the deal to Cancelled and access follows Dodo's status, never a separate date.</p>
+<p><strong>Existing accounts:</strong> <code>/start/referral</code> reads the entitlement before any checkout. Already paying, comped or on a trial: no checkout, straight to the welcome page with <code>status=existing</code> (booking only). A team member who is not the workspace owner (startPlan answers 403 today): the same, plus a note to ask their owner.</p>
+<p><strong>Gaps to build (none touch a Usetantra/* repo):</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Gap</th>
+<th>Where</th>
+<th>Who</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G2</td>
+<td>Tantra's Dodo checkout sends no trial. Add a 7 day trial (Dodo product <code>trial_period_days</code>, or per checkout) and the metadata above</td>
+<td><code>src/billing/plans.ts checkoutUrl()</code></td>
+<td>Tantra build, plus Adi's Dodo product setting if the API cannot</td>
+</tr>
+<tr>
+<td>G3</td>
+<td>The billing webhook is "not registered at Dodo yet"</td>
+<td>Dodo dashboard or API</td>
+<td>Tantra build (API), Adi only if a dashboard step is required</td>
+</tr>
+<tr>
+<td>G4</td>
+<td>The public start route <code>/start/referral</code> that carries the sender and token through sign up</td>
+<td>crm-app + crm-worker</td>
+<td>Tantra build</td>
+</tr>
+<tr>
+<td>G5</td>
+<td>The main app must read the entitlement (the 18 Nov request)</td>
+<td>Main app team</td>
+<td>Request is written; confirm its status with the dev team</td>
+</tr>
+<tr>
+<td>G6</td>
+<td>The main app's own Pro trial (usetantra.com/pricing) must not double charge someone who activated here</td>
+<td>Main app team</td>
+<td>Add to the same request</td>
+</tr>
+<tr>
+<td>G7</td>
+<td>There is no live checkout, and Tantra's billing plan today is "Tantra" at USD 4.99 (tantraPlan.ts:26). Add a live Tantra Pro product at $99 a month with the 7 day trial, make it the plan both apps read as paid, and a live path. Today: <code>startPlan</code> is test mode for test teams only (tantraPlan.ts:171-188). Add the live Tantra product and key and a live path</td>
+<td>crm-worker billing, Dodo live product</td>
+<td>Tantra build; the live key may need Adi</td>
+</tr>
+<tr>
+<td>G8</td>
+<td><code>checkoutUrl</code> hardcodes the return to <code>/billing?started=1</code> and fixed metadata (plans.ts:348-351). Make the return URL (with <code>status</code>, <code>r</code> and <code>from</code>) and metadata settable</td>
+<td><code>src/billing/plans.ts</code></td>
+<td>Tantra build</td>
+</tr>
+<tr>
+<td>G9</td>
+<td><code>subscription.active</code>, cancel and failure send their own billing mails and fire referral rewards (plans.ts:158-162). For <code>funnel: referral</code>, skip the kit welcome mail (sequence A replaces it) and never fire referral rewards</td>
+<td><code>src/billing/plans.ts</code></td>
+<td>Tantra build</td>
+</tr>
+<tr>
+<td>G11</td>
+<td>Grant the USD 30 trial credits on activation: <code>credit_grants</code> kind <code>referral_trial</code>, 30,000 credits, idempotent per workspace (the D49 referral grant is the pattern), and make every usage charge (calls, numbers, SMS, AI chat, enrichment) draw from that one balance. In Dodo: the Pro product and checkout carry the credits as the plan's included benefit, so a refund or chargeback claws back unused credits</td>
+<td>crm-worker credits and billing, Dodo product</td>
+<td>Tantra build</td>
+</tr>
+<tr>
+<td>G10</td>
+<td>The booking embed forwards only tracking keys. Accept <code>name</code> and <code>email</code> for prefill, and match a booking to the invite by <code>utm_content</code> token</td>
+<td>crm-app embed and booking</td>
+<td>Tantra build</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Launch gate:</strong> the trial button stays hidden in public (review mode only) until G2 to G11 are live <strong>and</strong> G5 and G6 are live on the main app, tested end to end with one real account that sees both apps unlock. Before that, nobody can start a trial that turns on only one app. Senders can still invite people to the video and the setup call.</p>
+<h3>9b. Phase 2: the <code>referral</code> funnel kind in Tantra</h3>
+<p>So any Tantra workspace can launch this funnel from the Funnels gallery:
+- <strong>Kind and template:</strong> add <code>referral</code> to <code>FUNNEL_KINDS</code> and <code>ENGINE_KINDS</code>, plus <code>KIND_TEXT</code>, <code>method/referral/kind.md</code>, <code>KIND_SPECS</code>, <code>kindWords</code>, <code>kindSizing</code> and <code>typeDefaults</code>. Add a <code>referral</code> template in <code>src/sites/templates/</code> with three pages (invite, welcome, booked), the booking page, the pipeline above and the sequences in TRIAL_SEQUENCES.md.
+- <strong>A link per team member:</strong> each member gets <code>/{funnel}/{member}</code> with their photo and name, and deals are owned by them.
+- <strong>Follow ups need approval too:</strong> messages 2 and 3 and every sequence step sent from a sender's personal account go into that sender's daily approval queue (one click per batch). Billing and trial mails (sequences A to D) go from the Tantra team identity, not personal accounts.
+- <strong>Compose and send:</strong> reuse the referral funnel's contacts, compose (AI draft per contact, 25 at a time), approve and send routes (<code>src/referralFunnel/outreach.ts</code>, <code>sendStepNow</code>). Make the pipeline, deal source and invite URL settable instead of fixed to "Tantra referrals".
+- <strong>Guards:</strong> first owner wins per contact across the workspace; daily caps per channel per member; suppressions on every channel.
+- <strong>Flag:</strong> <code>REFERRAL_KIND</code> (feature switch <code>referral_kind</code>), off by default. PRD gate and register rows first, E2E tests per page and per send.</p>
+<h3>Risks</h3>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Messages feel automated to people who know us</td>
+<td>The sender approves each batch; the AI only writes a fact it can source; message 1 is short and personal</td>
+</tr>
+<tr>
+<td>A contact gets messages from two team members</td>
+<td>First owner wins, checked at batch time</td>
+</tr>
+<tr>
+<td>LinkedIn or WhatsApp account limits</td>
+<td>Daily caps per person (OUTREACH.md, sending rules)</td>
+</tr>
+<tr>
+<td>The main app trial and the Tantra trial drift apart</td>
+<td>One activation event, one source of truth (section 9a)</td>
+</tr>
+</tbody>
+</table>
+<h2>10. Open questions</h2>
+<ol>
+<li>🔵 Which team members send in week 1, and how many contacts each?</li>
+<li>🔵 Does the receiver also get the referral credits (D49) when invited by a team member?</li>
+<li>🔵 Adi's recording date for the video.</li>
+</ol></div></details>
