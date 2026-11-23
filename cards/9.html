@@ -1,0 +1,255 @@
+<details class="doc" open><summary>PLAN.md</summary><div class="md"><h1>Plan: the Tantra referral funnel as a funnel type in Tantra, run from the chat</h1>
+<p>Status: plan only, nothing built (Adi, 23 Nov 2026). Code facts are from adisuja/tantra-crm origin/main 30eda7c0; B = tantra-backend-v2/crm-worker/src, F = tantra-frontend-v2/crm-app/src.</p>
+<h2>1. Goal and done means</h2>
+<p>Any Tantra workspace can say "set up a referral funnel" in the chat and end with the whole thing live: every team member's contacts imported, a personal page per prospect, invites going out from each member's own WhatsApp, LinkedIn and email plus SMS, a 7 day card trial that turns on both apps, the setup call booked, and the numbers reported back in chat.</p>
+<p><strong>Done when</strong>, on the QA workspace with test contacts only:
+1. One chat conversation creates the funnel, asks only what it cannot infer, and shows a plan with progress.
+2. Two test members import contacts from Google, a vCard and a LinkedIn export through one screen; duplicates merge; first owner wins.
+3. Each test prospect's page shows their name, company and personal line; the button names their referrer.
+4. Each member approves their first batch from a chat card; messages leave from that member's own accounts; nothing sends without the approval.
+5. A test prospect clicks, starts the trial (Dodo test), books the setup call, and their deal moves Invited to try, Watched, Trial started, Call booked, owned by the referrer.
+6. The chat answers "how is the referral funnel doing?" with per member numbers.</p>
+<h2>2. What it looks like in the chat</h2>
+<p><strong>The owner (Adi)</strong>
+1. "Set up a referral funnel." The chat calls <code>crm_funnel_create</code> with kind <code>referral</code>; the build plan appears with its steps.
+2. The chat fills the offer from what it knows (Tantra Pro, $99 a month after 7 days, $30 credits) and asks for confirmation on one card.
+3. "Who sends?" It lists team members and shows who has WhatsApp, LinkedIn and email connected; a card goes to each member who is missing an account, with the connect link.
+4. "Upload your video or paste its link." The page preview updates.
+5. It shows three sample personal pages built from real imported contacts and the message 1 draft per channel; the owner edits or approves.
+6. It runs a dry run on test contacts and shows the log.
+7. Launch stays the owner's button (<code>crm_funnel_launch_all</code> and <code>go_live</code> are blocked in chat today and stay blocked).</p>
+<p><strong>Each team member</strong>
+1. A chat card: "Import your contacts" opens the one import screen.
+2. After import: "412 people, 38 skipped (no name). Review them?" They untick anyone they would not message.
+3. Every morning: "Today's 40 invites are ready: approve, edit or skip." One click sends the batch inside their daily caps.
+4. Replies come back into their chat as "Priya replied: draft an answer?".</p>
+<p><strong>Anyone</strong>: "How is the referral funnel doing?" returns invited, replied, watched, trial, booked, paying, per member and per channel.</p>
+<h2>3. Architecture: what gets built where</h2>
+<h3>3.1 Register the kind (no behaviour yet)</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B/funnelOs/kinds.ts:8</td>
+<td>add <code>referral</code> to <code>FUNNEL_KINDS</code> and the template mapping</td>
+</tr>
+<tr>
+<td>B/funnelOs/method/index.ts:32,57 and method/referral/kind.md</td>
+<td>Engine kind and its method text</td>
+</tr>
+<tr>
+<td>B/funnelOs/engineRoutes.ts</td>
+<td><code>KIND</code> description and <code>KIND_LIST</code></td>
+</tr>
+<tr>
+<td>B/sites/types.ts:43</td>
+<td>new template category <code>referral</code></td>
+</tr>
+<tr>
+<td>B/funnelOs/kindWords.ts, typeDefaults.ts, kindSizing.ts</td>
+<td>copy, default senders, sizing</td>
+</tr>
+<tr>
+<td>B/routes/pages/shared.ts:216</td>
+<td><code>engineKindOf</code></td>
+</tr>
+<tr>
+<td>F/lib/pagesApi.ts, F/lib/funnelsApi.ts, F/components/pages/FunnelArt.tsx</td>
+<td>gallery card and labels</td>
+</tr>
+<tr>
+<td>B/features.ts</td>
+<td>flag <code>REFERRAL_KIND</code> (switch <code>referral_kind</code>), off by default</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 Template: pages, booking, pipeline, sequences</h3>
+<p>New <code>B/sites/templates/referral.ts</code> (a <code>TemplateDef</code>):
+- <strong>Pages</strong>: invite (per referrer and per prospect), welcome (after checkout, with active, failed and existing states), booked. Port the live hello.jointantra.com pages.
+- <strong>Booking</strong>: "Setup call", 20 minutes, group calendar, lands in Call booked.
+- <strong>Pipeline</strong>: Invited to try, Replied, Watched, Trial started, Call booked, Call done, Paying, Not now, Cancelled.
+- <strong>Sequences</strong>: message 1, SMS day 2, nudges day 3 and 7 (OUTREACH.md), and trial sequences A to D (TRIAL_SEQUENCES.md), using the new owner routing below.</p>
+<h3>3.3 Personal pages per visitor (new capability)</h3>
+<p>Today pages fill <code>{{token}}</code> placeholders from workspace and funnel settings only, and the page cache keys on host and path (B/sites/pageCache.ts:5-14).
+- Add prospect slots to the page renderer: <code>{{prospect.first_name}}</code>, <code>{{prospect.company}}</code>, <code>{{prospect.hook}}</code>, <code>{{referrer.name}}</code>, each with a fallback.
+- When a request carries a recipient token (<code>trk_recipient_tokens</code>, the existing per contact token), render uncached on the server: token to contact to deal, fill the slots, set a first-party cookie so the welcome and booked pages stay personal, add per prospect link preview tags.
+- Same design as the live Worker (hello.jointantra.com, worker/src/index.js), moved inside Tantra so the data comes from the deal and no separate store is needed.</p>
+<h3>3.4 One import screen per member (gap G12)</h3>
+<p>New <code>B/contacts/</code> module and an F page "Import my contacts":
+- Google Contacts and Other contacts via the People API (add <code>contacts.readonly</code> and <code>contacts.other.readonly</code> to <code>GOOGLE_SCOPES</code> in B/google.ts:11).
+- Gmail correspondents and WhatsApp chats with full pagination (B/referralFunnel/outreach.ts:41-68 read one page of 100 today).
+- LinkedIn connections via Unipile relations.
+- vCard and CSV upload (the merge logic of tools/import_contacts.py, ported).
+- Merge on email, E.164 phone and LinkedIn URL; contact owner per member with first owner wins (new owner_user_id on contacts, gap G17).
+- Each imported person becomes a deal in Invited to try, owned by the member, with <code>custom.channel</code> chosen (WhatsApp, then LinkedIn, then email).</p>
+<h3>3.5 Personal line per prospect (gap G15)</h3>
+<p>An AI task <code>referral.hook</code> beside <code>referral.compose</code> (B/referralFunnel/ai.ts): from company, title and, where available, a recent LinkedIn post or company news found by enrichment, write one sentence in the sender's voice, store it with its source in <code>custom.hook</code> and <code>custom.hook_source</code>. No source, no line (the page falls back).</p>
+<h3>3.6 Sending from each member's own accounts (gap G13)</h3>
+<ul>
+<li>New step sender <code>owner</code> in B/routes/automation.ts (:950, :990, :1007, :1109) and B/senders.ts:270: resolve the deal owner's own WhatsApp, LinkedIn or mailbox by <code>connected_by</code> (the logic of <code>pickAccount</code>, B/referralFunnel/connect.ts:74), skip with a reason if they have none.</li>
+<li>One sequence serves the whole team; no copy per member.</li>
+<li>SMS number per member, falling back to the workspace route (gap G18); daily email cap per sender.</li>
+</ul>
+<h3>3.7 Approval before anything sends (gap G14)</h3>
+<ul>
+<li>New step option <code>approval: "batch"</code>: runs due today wait in a per owner queue instead of sending.</li>
+<li>Each morning (and on demand) the owner gets a chat card with the batch: approve all, edit one, skip one. Approval releases exactly what was shown, inside caps (the referral funnel's approved send rule, B/referralFunnel/outreach.ts).</li>
+<li>Uses the existing team card seam <code>crm_team_card</code> / <code>crm_team_card_decide</code> (B/routes/teamTools.ts:20-22).</li>
+</ul>
+<h3>3.8 Tracking and stages (gap G16)</h3>
+<ul>
+<li><code>{{tracked_link}}</code> merge tag: the member's invite page with the prospect's recipient token.</li>
+<li>Page events from t.js (visit, video 25 to 100 percent, trial click) move the deal to Watched; conditions <code>link.clicked</code> and <code>page.watched</code> for steps.</li>
+<li>Trial and payment from the activation (below) move Trial started and Paying; bookings move Call booked; replies move Replied (existing stop on reply).</li>
+</ul>
+<h3>3.9 Single activation (from PRD 9a, gaps G2 to G11)</h3>
+<p>One Dodo checkout for Tantra Pro, $99 a month after a 7 day trial, $30 of usage credits, return to the welcome page; Dodo's trial is the only clock; the main app reads Tantra's entitlement (main app request G5, G6). This is a dependency of the funnel going public, not of the build.</p>
+<h3>3.10 Build spec, runners and launch</h3>
+<ul>
+<li><code>REFERRAL_TASKS</code> in B/funnelOs/kindSpecs.ts (<code>KIND_SPECS</code> :227): offer, senders and accounts, video, import (per member), review contacts, personal lines, page preview, message copy, dry run, launch.</li>
+<li>Runners in B/funnelOs/kindRunners.ts <code>KIND_RUNNERS</code>: provision pipeline and booking (reuse <code>ensureBookingPage</code> :97), create sequences, check each member's accounts, count imports, generate hooks, run the dry run.</li>
+<li>Step keys in B/funnelOs/launchAll.ts <code>UNIT_STEPS</code> so they actually go live.</li>
+<li>Dashboard: a referral section in <code>funnelDashboard</code> (dashboard.ts:61) with per member and per channel rows.</li>
+</ul>
+<h2>4. Chat control</h2>
+<table>
+<thead>
+<tr>
+<th>Seam</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crm_funnel_create</code></td>
+<td>accepts kind <code>referral</code>, then <code>makePlanAndStart</code></td>
+</tr>
+<tr>
+<td><code>crm_funnel_build_plan/start/run_step/poll</code></td>
+<td>run the referral steps; no change beyond the spec</td>
+</tr>
+<tr>
+<td>Guided build (<code>crm_funnel_chat_build</code>, B/funnelMvp/chatBuild, webinar only today)</td>
+<td>add a referral task map beside <code>POW_TASKS</code> (powTasks.ts:80)</td>
+</tr>
+<tr>
+<td>New tools</td>
+<td><code>crm_referral_import_status</code> (per member counts), <code>crm_referral_batch</code> (today's batch for a member), <code>crm_referral_batch_decide</code> (approve, edit, skip), <code>crm_referral_preview</code> (a sample personal page), <code>crm_referral_report</code> (numbers)</td>
+</tr>
+<tr>
+<td>Harness tool set (B/harness/toolSet.ts:13)</td>
+<td>add the read tools and the batch card tools; keep <code>launch_all</code>, <code>go_live</code> and deletes in <code>FORBIDDEN</code>; update test/d1/harnessToolSet.test.ts</td>
+</tr>
+<tr>
+<td>Crew roster (B/crew/roster.ts:50)</td>
+<td>give the funnel agent the <code>crm_referral_</code> prefix</td>
+</tr>
+<tr>
+<td>Approvals</td>
+<td>answers via <code>crm_funnel_answers_propose/decide</code>; sends only via batch cards; launch only by the person's button</td>
+</tr>
+<tr>
+<td>Inventory</td>
+<td><code>npm run inventory</code> for every new route</td>
+</tr>
+</tbody>
+</table>
+<p>Guardrails: the chat never sends a message, launches or charges on its own; every send is an approved batch; test workspaces reach test addresses only; daily caps per account; STOP and opt outs honoured on every channel.</p>
+<h2>5. Data</h2>
+<p>One migration (number assigned at merge; the highest on main is 0316):
+- <code>contacts.owner_user_id</code> and an index for first owner wins.
+- <code>ref_imports</code> (member, source, counts, status, started_at, finished_at).
+- <code>ref_batches</code> (member, date, deal ids, status, decided_by, decided_at).
+- Prospect slots read from deals and <code>trk_recipient_tokens</code>; no new store.</p>
+<h2>6. Build order (one batch PR each, CLOUD_ORCHESTRATOR_R9 deploy protocol)</h2>
+<table>
+<thead>
+<tr>
+<th>Batch</th>
+<th>Contents</th>
+<th>Depends on</th>
+<th>Proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>PRD gate rows in ONE_TANTRA section 9; kind registration (3.1); template (3.2) with today's copy</td>
+<td>nothing</td>
+<td>funnelKindBuild and kindSpecs tests; the kind shows in the gallery behind the flag</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Personal pages per visitor (3.3)</td>
+<td>1</td>
+<td>a test token renders name, company, line and referrer; no token renders defaults; cache untouched for normal visits</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Owner sender routing and SMS per member (3.6)</td>
+<td>none</td>
+<td>a test sequence sends from two different members' test accounts</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Approval batches and chat cards (3.7)</td>
+<td>3</td>
+<td>nothing sends until the card is approved; approve releases exactly the shown batch</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Import screen and merge (3.4), contact owner</td>
+<td>none</td>
+<td>Google, vCard and LinkedIn test exports merge into the right count</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Personal line AI task (3.5)</td>
+<td>5</td>
+<td>every line has a source or is empty</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Tracking, stages and conditions (3.8)</td>
+<td>2</td>
+<td>visit, video and trial click move the deal</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Build spec, runners, launch steps, dashboard, guided chat map, harness tools (3.10, 4)</td>
+<td>1 to 7</td>
+<td>the full chat run in section 1 on QA</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Single activation (3.9)</td>
+<td>Dodo product, main app G5 and G6</td>
+<td>a test checkout unlocks both apps and moves Trial started</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Move the live pages from hello.jointantra.com into Tantra pages on the same domain</td>
+<td>2, 8</td>
+<td>every review link on card 2 still works</td>
+</tr>
+</tbody>
+</table>
+<p>Batches 3, 5 and 6 can run in parallel with 1 and 2.</p>
+<h2>7. How we check it</h2>
+<ul>
+<li>Eval criteria are section 1, run end to end on the QA workspace with test contacts and Adi's test addresses only.</li>
+<li>An independent critic reviews the PRD gate section before batch 1 and the full chat run before launch.</li>
+<li>Every batch: unit tests, E2E for each page state and each send path, inventory and build:assets, one deploy.</li>
+</ul>
+<h2>8. Decisions for Adi</h2>
+<ol>
+<li>Who can import and send: every team member, or only members Adi switches on?</li>
+<li>Daily caps per member (today: WhatsApp 50, LinkedIn 60; email proposed 30).</li>
+<li>Can other workspaces use this kind for their own referral launches (it is a product feature), or is it Tantra only for now?</li>
+<li>Keep hello.jointantra.com as the page domain after the move into Tantra (recommended, links already sent stay valid).</li>
+</ol></div></details>
