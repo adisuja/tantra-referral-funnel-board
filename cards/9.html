@@ -1,7 +1,7 @@
 <details class="doc" open><summary>PLAN.md</summary><div class="md"><h1>Plan: the Tantra referral funnel as a funnel type in Tantra, run from the chat</h1>
-<p>Status: plan only, nothing built (Adi, 23 Nov 2026). Code facts are from adisuja/tantra-crm origin/main 30eda7c0; B = tantra-backend-v2/crm-worker/src, F = tantra-frontend-v2/crm-app/src.</p>
+<p>Status: plan only, nothing built. Decisions answered by Adi on 23 Nov 2026 (section 8). Code facts are from adisuja/tantra-crm origin/main 30eda7c0; B = tantra-backend-v2/crm-worker/src, F = tantra-frontend-v2/crm-app/src.</p>
 <h2>1. Goal and done means</h2>
-<p>Any Tantra workspace can say "set up a referral funnel" in the chat and end with the whole thing live: every team member's contacts imported, a personal page per prospect, invites going out from each member's own WhatsApp, LinkedIn and email plus SMS, a 7 day card trial that turns on both apps, the setup call booked, and the numbers reported back in chat.</p>
+<p>It is a product feature (Adi, 23 Nov): any customer workspace can say "set up a referral funnel" in the chat and launch its own referral funnel for its own product: every team member's contacts imported, a personal page per prospect, invites going out from each member's own WhatsApp, LinkedIn and email plus SMS, the workspace's own offer (a trial, a call or a checkout), the call booked, and the numbers reported back in chat. Tantra's own launch is the first workspace to run it, with the Tantra Pro trial that turns on both apps.</p>
 <p><strong>Done when</strong>, on the QA workspace with test contacts only:
 1. One chat conversation creates the funnel, asks only what it cannot infer, and shows a plan with progress.
 2. Two test members import contacts from Google, a vCard and a LinkedIn export through one screen; duplicates merge; first owner wins.
@@ -12,8 +12,8 @@
 <h2>2. What it looks like in the chat</h2>
 <p><strong>The owner (Adi)</strong>
 1. "Set up a referral funnel." The chat calls <code>crm_funnel_create</code> with kind <code>referral</code>; the build plan appears with its steps.
-2. The chat fills the offer from what it knows (Tantra Pro, $99 a month after 7 days, $30 credits) and asks for confirmation on one card.
-3. "Who sends?" It lists team members and shows who has WhatsApp, LinkedIn and email connected; a card goes to each member who is missing an account, with the connect link.
+2. The chat fills the offer from the workspace's own funnel settings (<code>settings.offer</code>, B/funnelOs/offerModel.ts: trial days, price, button link) and asks for confirmation on one card. For Tantra's own workspace that is Tantra Pro, $99 a month after 7 days, with $30 of credits.
+3. Every team member can import and send (Adi, 23 Nov). The chat lists them and shows who has WhatsApp, LinkedIn and email connected; a card goes to each member who is missing an account, with the connect link.
 4. "Upload your video or paste its link." The page preview updates.
 5. It shows three sample personal pages built from real imported contacts and the message 1 draft per channel; the owner edits or approves.
 6. It runs a dry run on test contacts and shows the log.
@@ -70,7 +70,8 @@
 </table>
 <h3>3.2 Template: pages, booking, pipeline, sequences</h3>
 <p>New <code>B/sites/templates/referral.ts</code> (a <code>TemplateDef</code>):
-- <strong>Pages</strong>: invite (per referrer and per prospect), welcome (after checkout, with active, failed and existing states), booked. Port the live hello.jointantra.com pages.
+- <strong>Pages</strong>: invite (per referrer and per prospect), welcome (after the offer, with active, failed and existing states), booked. Port the live hello.jointantra.com pages; every word that names Tantra, the product or the offer comes from the workspace's brand and offer settings, so a customer's funnel speaks about their product. A page per member is generated from the team list, so new members get a page automatically.
+- <strong>Domain</strong>: each workspace serves its funnel on its own domain (<code>crm_pages_add_domain</code>) or the Tantra pages default. Tantra's own funnel stays on hello.jointantra.com (Adi, 23 Nov), so links already sent keep working.
 - <strong>Booking</strong>: "Setup call", 20 minutes, group calendar, lands in Call booked.
 - <strong>Pipeline</strong>: Invited to try, Replied, Watched, Trial started, Call booked, Call done, Paying, Not now, Cancelled.
 - <strong>Sequences</strong>: message 1, SMS day 2, nudges day 3 and 7 (OUTREACH.md), and trial sequences A to D (TRIAL_SEQUENCES.md), using the new owner routing below.</p>
@@ -93,7 +94,8 @@
 <ul>
 <li>New step sender <code>owner</code> in B/routes/automation.ts (:950, :990, :1007, :1109) and B/senders.ts:270: resolve the deal owner's own WhatsApp, LinkedIn or mailbox by <code>connected_by</code> (the logic of <code>pickAccount</code>, B/referralFunnel/connect.ts:74), skip with a reason if they have none.</li>
 <li>One sequence serves the whole team; no copy per member.</li>
-<li>SMS number per member, falling back to the workspace route (gap G18); daily email cap per sender.</li>
+<li>SMS number per member, falling back to the workspace route (gap G18).</li>
+<li>Daily caps per member (Adi, 23 Nov): WhatsApp 50, LinkedIn 60, email 30, plus Tantra's existing per account rate limits and spacing between sends. A batch never releases more than what is left of the day's cap.</li>
 </ul>
 <h3>3.7 Approval before anything sends (gap G14)</h3>
 <ul>
@@ -107,8 +109,8 @@
 <li>Page events from t.js (visit, video 25 to 100 percent, trial click) move the deal to Watched; conditions <code>link.clicked</code> and <code>page.watched</code> for steps.</li>
 <li>Trial and payment from the activation (below) move Trial started and Paying; bookings move Call booked; replies move Replied (existing stop on reply).</li>
 </ul>
-<h3>3.9 Single activation (from PRD 9a, gaps G2 to G11)</h3>
-<p>One Dodo checkout for Tantra Pro, $99 a month after a 7 day trial, $30 of usage credits, return to the welcome page; Dodo's trial is the only clock; the main app reads Tantra's entitlement (main app request G5, G6). This is a dependency of the funnel going public, not of the build.</p>
+<h3>3.9 The offer step: any workspace's own, Tantra's single activation</h3>
+<p>A customer workspace's invite page uses its own offer from <code>settings.offer</code>: a trial or checkout link through its own payment connection (<code>crm_trk_save_payment_connection</code>, so trial started and paid move the deal), or a call only. Tantra's own workspace uses the single activation (PRD 9a, gaps G2 to G11): one Dodo checkout for Tantra Pro, $99 a month after a 7 day trial, $30 of usage credits, Dodo's trial as the only clock, and the main app reading Tantra's entitlement (main app request G5, G6). That is a dependency of Tantra's own funnel going public, not of the feature.</p>
 <h3>3.10 Build spec, runners and launch</h3>
 <ul>
 <li><code>REFERRAL_TASKS</code> in B/funnelOs/kindSpecs.ts (<code>KIND_SPECS</code> :227): offer, senders and accounts, video, import (per member), review contacts, personal lines, page preview, message copy, dry run, launch.</li>
@@ -179,7 +181,7 @@
 <tbody>
 <tr>
 <td>1</td>
-<td>PRD gate rows in ONE_TANTRA section 9; kind registration (3.1); template (3.2) with today's copy</td>
+<td>PRD gate rows in ONE_TANTRA section 9; kind registration (3.1); template (3.2) with copy that reads the workspace's brand and offer</td>
 <td>nothing</td>
 <td>funnelKindBuild and kindSpecs tests; the kind shows in the gallery behind the flag</td>
 </tr>
@@ -246,10 +248,17 @@
 <li>An independent critic reviews the PRD gate section before batch 1 and the full chat run before launch.</li>
 <li>Every batch: unit tests, E2E for each page state and each send path, inventory and build:assets, one deploy.</li>
 </ul>
-<h2>8. Decisions for Adi</h2>
+<h2>8. Decisions (Adi, 23 Nov 2026)</h2>
 <ol>
-<li>Who can import and send: every team member, or only members Adi switches on?</li>
-<li>Daily caps per member (today: WhatsApp 50, LinkedIn 60; email proposed 30).</li>
-<li>Can other workspaces use this kind for their own referral launches (it is a product feature), or is it Tantra only for now?</li>
-<li>Keep hello.jointantra.com as the page domain after the move into Tantra (recommended, links already sent stay valid).</li>
-</ol></div></details>
+<li><strong>Every team member can import and send.</strong> No per member switch; the owner sees everyone's numbers.</li>
+<li><strong>Daily caps per member: WhatsApp 50, LinkedIn 60, email 30</strong>, inside Tantra's rate limits.</li>
+<li><strong>A product feature for every workspace.</strong> Any client, customer or user of the Tantra app can launch their own referral funnel in any workspace; nothing is Tantra specific in the kind, the template or the chat.</li>
+<li><strong>Tantra's pages stay on hello.jointantra.com</strong> after the move into Tantra.</li>
+</ol>
+<h3>What decision 3 adds to the build</h3>
+<ul>
+<li>Copy, brand, offer and domain read from each workspace's settings (3.2, 3.9); no Tantra wording in the template.</li>
+<li>Billing: imports, AI lines and sends use the workspace's own credits and channel costs, like every other funnel, with the $30 trial credits covering a new Tantra user's first runs.</li>
+<li>Limits for every workspace: the same caps, opt outs, STOP handling, consent rules per country and test workspace rules apply to customers' funnels, not only ours.</li>
+<li>The gallery card, help text and the chat's guided build speak to a customer launching their own product (Batch 8).</li>
+</ul></div></details>
